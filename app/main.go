@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/caarlos0/env"
-	"github.com/dockle_cmd/app/dockle"
-	"github.com/dockle_cmd/app/githubissue"
-	"github.com/dockle_cmd/app/service"
+	"github.com/dockle_cmd/dockle"
+	"github.com/dockle_cmd/githubissue"
+	"github.com/dockle_cmd/service"
 )
 
 func main() {
