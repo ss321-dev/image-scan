@@ -1,4 +1,4 @@
-package service
+package dockle
 
 import "strings"
 
@@ -18,7 +18,7 @@ var ErrorLevel = map[string]int{
 	"pass":  pass,
 }
 
-func convertErrorLevelToNumber(errorLevel string) int {
+func ConvertErrorLevelToNumber(errorLevel string) int {
 	number, _ := ErrorLevel[strings.ToLower(errorLevel)]
 	return number
 }

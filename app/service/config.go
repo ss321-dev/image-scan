@@ -3,6 +3,8 @@ package service
 import (
 	"errors"
 	"strings"
+
+	"github.com/dockle_cmd/dockle"
 )
 
 type Config struct {
@@ -20,13 +22,13 @@ type Config struct {
 }
 
 func (c Config) Validate() error {
-	var errorText []string
 
-	if _, ok := ErrorLevel[strings.ToLower(c.ErrorLevel)]; !ok {
+	var errorText []string
+	if _, ok := dockle.ErrorLevel[strings.ToLower(c.ErrorLevel)]; !ok {
 		errorText = append(errorText, "ERROR_LEVEL should be set to one of the following values [fatal, warn, info, skip, pass]")
 	}
 
-	if _, ok := ErrorLevel[strings.ToLower(c.IssueErrorLevel)]; !ok {
+	if _, ok := dockle.ErrorLevel[strings.ToLower(c.IssueErrorLevel)]; !ok {
 		errorText = append(errorText, "ISSUE_ERROR_LEVEL should be set to one of the following values [fatal, warn, info, skip, pass]")
 	}
 
@@ -37,7 +39,7 @@ func (c Config) Validate() error {
 }
 
 func (c Config) IsError(errorLevel string) bool {
-	return convertErrorLevelToNumber(c.ErrorLevel) >= convertErrorLevelToNumber(errorLevel)
+	return dockle.ConvertErrorLevelToNumber(c.ErrorLevel) >= dockle.ConvertErrorLevelToNumber(errorLevel)
 }
 
 func (c Config) IsIssueError(errorLevel string, code string) bool {
@@ -46,5 +48,5 @@ func (c Config) IsIssueError(errorLevel string, code string) bool {
 			return false
 		}
 	}
-	return convertErrorLevelToNumber(c.IssueErrorLevel) >= convertErrorLevelToNumber(errorLevel)
+	return dockle.ConvertErrorLevelToNumber(c.IssueErrorLevel) >= dockle.ConvertErrorLevelToNumber(errorLevel)
 }
