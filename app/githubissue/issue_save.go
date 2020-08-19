@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/google/go-github/v32/github"
 	"golang.org/x/oauth2"
@@ -25,8 +24,7 @@ func SaveIssue(ctx context.Context, config Config, issueOperations []IssueOperat
 	issues, response, err := client.Issues.ListByRepo(ctx, config.Owner, config.Repository, &issueListByRepoOptions)
 	if err != nil {
 		repositoryName := config.Owner + config.Repository
-		log.Println(fmt.Errorf("failed to search Issue from repository[%s]: %s", repositoryName, err))
-		return err
+		return fmt.Errorf("failed to search Issue from repository[%s]: %s", repositoryName, err)
 	}
 
 	// git hub api limit value
@@ -58,8 +56,7 @@ func SaveIssue(ctx context.Context, config Config, issueOperations []IssueOperat
 	// limit check
 	if len(requestIssueOperations) > remainingAccess {
 		err := errors.New(fmt.Sprintf("GitHub API rate limit exceeded. This limit resets at %s", resetTime.String()))
-		log.Println(fmt.Errorf("failed to access API: %s", err))
-		return err
+		return fmt.Errorf("failed to access API: %s", err)
 	}
 
 	// save issue
@@ -68,13 +65,11 @@ func SaveIssue(ctx context.Context, config Config, issueOperations []IssueOperat
 		issueRequest := requestIssueOperation.convertIssueRequest()
 		if requestIssueOperation.number == 0 {
 			if _, _, err := client.Issues.Create(ctx, config.Owner, config.Repository, &issueRequest); err != nil {
-				log.Println(fmt.Errorf("failed to create Issue: %s", err))
-				return err
+				return fmt.Errorf("failed to create Issue: %s", err)
 			}
 		} else if *issueRequest.State != StateClose || isAutoClose {
 			if _, _, err := client.Issues.Edit(ctx, config.Owner, config.Repository, requestIssueOperation.number, &issueRequest); err != nil {
-				log.Println(fmt.Errorf("failed to edit Issue number[%d]: %s", requestIssueOperation.number, err))
-				return err
+				return fmt.Errorf("failed to edit Issue number[%d]: %s", requestIssueOperation.number, err)
 			}
 		}
 	}

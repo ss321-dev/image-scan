@@ -7,7 +7,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -18,26 +17,22 @@ import (
 func Scan(ctx context.Context, config Config) (*ScanResult, error) {
 
 	if config.ScanImageName == "" {
-		err := errors.New("the name of the image to be scanned is empty")
-		log.Println(fmt.Errorf("invalid parameter: %s", err))
+		err := fmt.Errorf("invalid parameter: %s", errors.New("the name of the image to be scanned is empty"))
 		return nil, err
 	}
 
 	imageName, err := GetLatestImageName()
 	if err != nil {
-		log.Println(fmt.Errorf("failed to get the latest tag: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to get the latest tag: %s", err)
 	}
 
 	client, err := client.NewEnvClient()
 	if err != nil {
-		log.Println(fmt.Errorf("failed to create DockerClient: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to create DockerClient: %s", err)
 	}
 
 	if _, err := client.ImagePull(ctx, imageName, types.ImagePullOptions{}); err != nil {
-		log.Println(fmt.Errorf("failed to pull docker image: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to pull docker image: %s", err)
 	}
 
 	dockerConfig := container.Config{
@@ -59,37 +54,31 @@ func Scan(ctx context.Context, config Config) (*ScanResult, error) {
 
 	container, err := client.ContainerCreate(ctx, &dockerConfig, &hostConfig, nil, "")
 	if err != nil {
-		log.Println(fmt.Errorf("failed to create docker container of image[%s]: %s", imageName, err))
-		return nil, err
+		return nil, fmt.Errorf("failed to create docker container of image[%s]: %s", imageName, err)
 	}
 
 	if err := client.ContainerStart(ctx, container.ID, types.ContainerStartOptions{}); err != nil {
-		log.Println(fmt.Errorf("failed to start docker container of image[%s]: %s", imageName, err))
-		return nil, err
+		return nil, fmt.Errorf("failed to start docker container of image[%s]: %s", imageName, err)
 	}
 
 	if _, err := client.ContainerWait(ctx, container.ID); err != nil {
-		log.Println(fmt.Errorf("failed to wait for docker container to finish running: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to wait for docker container to finish running: %s", err)
 	}
 
 	reader, err := client.ContainerLogs(ctx, container.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
-		log.Println(fmt.Errorf("failed to get container execution Log: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to get container execution Log: %s", err)
 	}
 
 	var buf bytes.Buffer
 	if _, err = io.Copy(&buf, reader); err != nil {
-		log.Println(fmt.Errorf("failed to read io.ReadCloser of container's execution has been written: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to read io.ReadCloser of container's execution has been written: %s", err)
 	}
 
 	var scanResult ScanResult
 	err = json.Unmarshal(buf.Bytes(), &scanResult)
 	if err != nil {
-		log.Println(fmt.Errorf("failed to parse the results of a scan in the json format: %s", err))
-		return nil, err
+		return nil, fmt.Errorf("failed to parse the results of a scan in the json format: %s", err)
 	}
 	return &scanResult, nil
 }

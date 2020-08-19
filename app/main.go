@@ -33,7 +33,7 @@ func main() {
 	}
 	results, err := dockle.Scan(ctx, dockleConfig)
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	issueSearch := githubissue.IssueSearch{
@@ -64,7 +64,7 @@ func main() {
 		Repository:  config.GitHubRepository,
 	}
 	if err := githubissue.SaveIssue(ctx, gitHubConfig, issueOperations, issueSearch, true); err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	os.Exit(exitCode)
