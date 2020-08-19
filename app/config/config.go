@@ -17,7 +17,7 @@ type Config struct {
 	GitHubOwner          string   `env:"GIT_HUB_Owner,required"`
 	GitHubRepository     string   `env:"GIT_HUB_Repository,required"`
 	IssueApplicationType string   `env:"ISSUE_APPLICATION_TYPE,required"`
-	IssueScanType        string   `env:"ISSUE_SCAN_TYPE,required"`
+	IssueScanType        string   `env:"ISSUE_SCAN_TYPE" envDefault:"dockle"`
 	IssueEnvironment     string   `env:"ISSUE_ENVIRONMENT,required"`
 }
 
