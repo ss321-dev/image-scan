@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/caarlos0/env"
-	"github.com/dockle_cmd/config"
 	"github.com/dockle_cmd/dockle"
 	"github.com/dockle_cmd/githubissue"
+	"github.com/dockle_cmd/setting"
 )
 
 func main() {
@@ -18,7 +18,7 @@ func main() {
 	ctx := context.Background()
 
 	// convert environment variable to config
-	var config config.Config
+	var config setting.Config
 	if err := env.Parse(&config); err != nil {
 		log.Fatal(err)
 	}
