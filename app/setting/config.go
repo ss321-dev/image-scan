@@ -25,7 +25,7 @@ func (c Config) Validate() error {
 
 	var errorText []string
 	if _, ok := dockle.ErrorLevel[strings.ToLower(c.ExitErrorLevel)]; !ok {
-		errorText = append(errorText, "ERROR_LEVEL should be set to one of the following values [fatal, warn, info, skip, pass]")
+		errorText = append(errorText, "EXIT_ERROR_LEVEL should be set to one of the following values [fatal, warn, info, skip, pass]")
 	}
 
 	if _, ok := dockle.ErrorLevel[strings.ToLower(c.IssueErrorLevel)]; !ok {
