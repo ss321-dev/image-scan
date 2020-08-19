@@ -52,7 +52,7 @@ func main() {
 			})
 		}
 
-		if config.IsError(result.Level) {
+		if config.IsExitError(result.Level) {
 			exitCode = 1
 		}
 	}

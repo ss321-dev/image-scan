@@ -10,7 +10,7 @@ import (
 type Config struct {
 	ScanImageName        string   `env:"SCAN_IMAGE,required"`
 	IsLocalImage         bool     `env:"IS_LOCAL_IMAGE"`
-	ErrorLevel           string   `env:"ERROR_LEVEL" envDefault:"fatal"`
+	ExitErrorLevel       string   `env:"EXIT_ERROR_LEVEL" envDefault:"fatal"`
 	IssueErrorLevel      string   `env:"ISSUE_ERROR_LEVEL" envDefault:"warn"`
 	IgnoreErrorCodes     []string `env:"IGNORE_ERROR_CODES" envSeparator:":"`
 	GitHubAccessToken    string   `env:"GIT_HUB_ACCESS_TOKEN,required"`
@@ -24,7 +24,7 @@ type Config struct {
 func (c Config) Validate() error {
 
 	var errorText []string
-	if _, ok := dockle.ErrorLevel[strings.ToLower(c.ErrorLevel)]; !ok {
+	if _, ok := dockle.ErrorLevel[strings.ToLower(c.ExitErrorLevel)]; !ok {
 		errorText = append(errorText, "ERROR_LEVEL should be set to one of the following values [fatal, warn, info, skip, pass]")
 	}
 
@@ -38,8 +38,8 @@ func (c Config) Validate() error {
 	return nil
 }
 
-func (c Config) IsError(errorLevel string) bool {
-	return dockle.ConvertErrorLevelToNumber(c.ErrorLevel) >= dockle.ConvertErrorLevelToNumber(errorLevel)
+func (c Config) IsExitError(errorLevel string) bool {
+	return dockle.ConvertErrorLevelToNumber(c.ExitErrorLevel) >= dockle.ConvertErrorLevelToNumber(errorLevel)
 }
 
 func (c Config) IsIssueError(errorLevel string, code string) bool {
