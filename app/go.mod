@@ -3,6 +3,7 @@ module github.com/dockle_cmd
 go 1.14
 
 require (
+	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/caarlos0/env v3.5.0+incompatible
 	github.com/docker/distribution v2.7.1+incompatible // indirect
 	github.com/docker/docker v1.13.1
