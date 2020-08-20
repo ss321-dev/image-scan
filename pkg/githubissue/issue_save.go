@@ -18,10 +18,17 @@ func SaveIssue(ctx context.Context, config Config, issueOperations []IssueOperat
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	// search issue only open
-	issueListByRepoOptions := issueSearch.convertIssueListByRepoOptions()
-	issueListByRepoOptions.State = StateOpen
-	issues, response, err := client.Issues.ListByRepo(ctx, config.Owner, config.Repository, &issueListByRepoOptions)
+	openListByRepoOptions := issueSearch.convertIssueListByRepoOptions()
+	openListByRepoOptions.State = StateOpen
+	openIssues, _, err := client.Issues.ListByRepo(ctx, config.Owner, config.Repository, &openListByRepoOptions)
+	if err != nil {
+		repositoryName := config.Owner + config.Repository
+		return fmt.Errorf("failed to search Issue from repository[%s]: %s", repositoryName, err)
+	}
+
+	closeListByRepoOptions := issueSearch.convertIssueListByRepoOptions()
+	closeListByRepoOptions.State = StateClose
+	closedIssues, response, err := client.Issues.ListByRepo(ctx, config.Owner, config.Repository, &closeListByRepoOptions)
 	if err != nil {
 		repositoryName := config.Owner + config.Repository
 		return fmt.Errorf("failed to search Issue from repository[%s]: %s", repositoryName, err)
@@ -32,23 +39,33 @@ func SaveIssue(ctx context.Context, config Config, issueOperations []IssueOperat
 	resetTime := response.Rate.Reset
 
 	// create issue request
-	requestIssueOperations := convertIssuesToIssueOperations(issues, StateClose)
+	requestIssueOperations := convertIssuesToIssueOperations(openIssues, StateClose)
+	closedIssueOperations := convertIssuesToIssueOperations(closedIssues, StateClose)
 	for _, issueOperation := range issueOperations {
 
-		isAlreadyIssue := false
+		// already open issue
+		isOpenIssue := false
 		for index, requestIssueOperation := range requestIssueOperations {
 
 			if requestIssueOperation.Title == issueOperation.Title {
-				isAlreadyIssue = true
+				isOpenIssue = true
 				requestIssueOperations[index].Body = issueOperation.Body
 				requestIssueOperations[index].Labels = issueOperation.Labels
 				requestIssueOperations[index].state = StateOpen
 				break
 			}
 		}
-
-		if isAlreadyIssue {
+		if isOpenIssue {
 			continue
+		}
+
+		// reoccurring closed issue
+		for _, closedIssueOperation := range closedIssueOperations {
+
+			if closedIssueOperation.Title == issueOperation.Title {
+				issueOperation.number = closedIssueOperation.number
+				break
+			}
 		}
 		requestIssueOperations = append(requestIssueOperations, issueOperation)
 	}
