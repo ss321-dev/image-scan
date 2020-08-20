@@ -1,6 +1,6 @@
-module github.com/dockle_cmd
+module github.com/ss321-dev/image-scan
 
-go 1.14
+go 1.15
 
 require (
 	github.com/Microsoft/go-winio v0.4.14 // indirect

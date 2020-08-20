@@ -1,30 +1,19 @@
-package main
+package service
 
 import (
 	"context"
 	"fmt"
-	"log"
-	"os"
 	"strings"
 
-	"github.com/caarlos0/env"
-	"github.com/dockle_cmd/conf"
-	"github.com/dockle_cmd/dockle"
-	"github.com/dockle_cmd/githubissue"
+	"github.com/ss321-dev/image-scan/internal/code"
+	"github.com/ss321-dev/image-scan/internal/conf"
+	"github.com/ss321-dev/image-scan/pkg/dockle"
+	"github.com/ss321-dev/image-scan/pkg/githubissue"
 )
 
-func main() {
+func DockleScan(config conf.Config) (int, error) {
 
 	ctx := context.Background()
-
-	// convert environment variable to config
-	var config conf.Config
-	if err := env.Parse(&config); err != nil {
-		log.Fatal(err)
-	}
-	if err := config.Validate(); err != nil {
-		log.Fatal(err)
-	}
 
 	// scan dockle
 	dockleConfig := dockle.Config{
@@ -33,15 +22,15 @@ func main() {
 	}
 	results, err := dockle.Scan(ctx, dockleConfig)
 	if err != nil {
-		log.Fatal(err)
+		return code.ErrorExitCode, err
 	}
 
 	issueSearch := githubissue.IssueSearch{
-		Labels: []string{config.IssueApplicationType, config.IssueScanType, config.IssueEnvironment},
+		Labels: []string{config.IssueApplicationType, config.ImageScanType, config.IssueEnvironment},
 	}
 
 	var issueOperations []githubissue.IssueOperation
-	exitCode := 0
+	exitCode := code.SuccessExitCode
 	for _, result := range results.Details {
 
 		if config.IsIssueError(result.Level, result.Code) {
@@ -53,7 +42,7 @@ func main() {
 		}
 
 		if config.IsExitError(result.Level) {
-			exitCode = 1
+			exitCode = code.ErrorExitCode
 		}
 	}
 
@@ -64,8 +53,9 @@ func main() {
 		Repository:  config.GitHubRepository,
 	}
 	if err := githubissue.SaveIssue(ctx, gitHubConfig, issueOperations, issueSearch, true); err != nil {
-		log.Fatal(err)
+		if err != nil {
+			return code.ErrorExitCode, err
+		}
 	}
-
-	os.Exit(exitCode)
+	return exitCode, nil
 }
