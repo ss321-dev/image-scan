@@ -17,8 +17,8 @@ type Config struct {
 	IssueDockleErrorLevel string   `env:"ISSUE_DOCKLE_ERROR_LEVEL" envDefault:"warn"`
 	IgnoreErrorCodes      []string `env:"IGNORE_ERROR_CODES" envSeparator:":"`
 	GitHubAccessToken     string   `env:"GIT_HUB_ACCESS_TOKEN,required"`
-	GitHubOwner           string   `env:"GIT_HUB_Owner,required"`
-	GitHubRepository      string   `env:"GIT_HUB_Repository,required"`
+	GitHubOwner           string   `env:"GIT_HUB_OWNER,required"`
+	GitHubRepository      string   `env:"GIT_HUB_REPOSITORY,required"`
 	IssueApplicationType  string   `env:"ISSUE_APPLICATION_TYPE,required"`
 	IssueEnvironment      string   `env:"ISSUE_ENVIRONMENT,required"`
 }

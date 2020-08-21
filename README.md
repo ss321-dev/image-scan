@@ -11,7 +11,7 @@
 | ISSUE_DOCKLE_ERROR_LEVEL | Dockle error level to create an issue [fatal, warn, info, skip, pass] |          | warn    |                         |
 | IGNORE_ERROR_CODES       | Error codes to ignore                                                 |          | []      | CIS-DI-0000:DKL-DI-0000 |
 | GIT_HUB_ACCESS_TOKEN     | GitHub access tokens                                                  | \*       |         |                         |
-| GIT_HUB_Owner            | Name of the owner or organization of the repository                   | \*       |         |                         |
-| GIT_HUB_Repository       | Repository name                                                       | \*       |         |                         |
+| GIT_HUB_OWNER            | Name of the owner or organization of the repository                   | \*       |         |                         |
+| GIT_HUB_REPOSITORY       | Repository name                                                       | \*       |         |                         |
 | ISSUE_APPLICATION_TYPE   | The application name to be set for the label                          | \*       |         |                         |
 | ISSUE_ENVIRONMENT        | The environment to be labeled                                         | \*       |         |                         |
